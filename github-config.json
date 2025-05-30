@@ -1,0 +1,22 @@
+{
+  "$schema": "./config-schema.json",
+  "api": {
+    "client": {
+      "rateLimit": 100,
+      "proxies": [
+        {
+          "type": "env",
+          "key": "client_proxy_1"
+        },
+        {
+          "type": "env",
+          "key": "client_proxy_2"
+        },
+        {
+          "type": "env",
+          "key": "client_proxy_3"
+        }
+      ]
+    }
+  }
+}

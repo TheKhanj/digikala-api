@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "type": "object",
+          "properties": {
+            "rateLimit": {
+              "type": "integer",
+              "description": "Sleep time between each proxy's requests in miliseconds"
+            },
+            "proxies": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/expression",
+                "description": "Supports http, https and socks5 proxies",
+                "examples": [
+                  "http://...",
+                  "https://...",
+                  "socks5://..."
+                ]
+              }
+            }
+          },
+          "required": [
+            "proxies",
+            "rateLimit"
+          ]
+        }
+      },
+      "required": [
+        "client"
+      ]
+    }
+  },
+  "required": [
+    "api"
+  ],
+  "definitions": {
+    "expression": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "env"
+              ]
+            },
+            "key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "key"
+          ]
+        }
+      ]
+    }
+  }
+}
