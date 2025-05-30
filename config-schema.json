@@ -15,12 +15,13 @@
             "proxies": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/expression",
-                "description": "Supports http, https and socks5 proxies",
-                "examples": [
-                  "http://...",
-                  "https://...",
-                  "socks5://..."
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/proxy"
+                  },
+                  {
+                    "$ref": "#/definitions/proxy-cmd"
+                  }
                 ]
               }
             }
@@ -40,38 +41,24 @@
     "api"
   ],
   "definitions": {
-    "expression": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "number"
-        },
-        {
-          "type": "null"
-        },
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": [
-                "env"
-              ]
-            },
-            "key": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "key"
-          ]
-        }
+    "proxy": {
+      "type": "string",
+      "pattern": "^[^!].*",
+      "description": "Supports http, https and socks5 proxies",
+      "examples": [
+        "http://...",
+        "https://...",
+        "socks5://..."
+      ]
+    },
+    "proxy-cmd": {
+      "type": "string",
+      "pattern": "^!.*",
+      "description": "Executes the provided process using execl system call which is expected to return a list of proxies",
+      "examples": [
+        "!",
+        "https://...",
+        "socks5://..."
       ]
     }
   }

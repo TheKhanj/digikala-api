@@ -55,7 +55,7 @@ func NewProxyClient(proxyStr string) (*http.Client, error) {
 		strings.HasPrefix(proxyStr, "https://") {
 		t, err = httpTransport(proxyStr)
 	} else {
-		err = fmt.Errorf("unsupported proxy protocol (%s)", proxyStr)
+		err = fmt.Errorf("not supported proxy protocol: (%s)", proxyStr)
 	}
 
 	if err != nil {

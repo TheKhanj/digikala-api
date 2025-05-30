@@ -94,7 +94,7 @@ func TestClientPoolRateLimit(t *testing.T) {
 	if tooShort {
 		t.Fatalf("requests took too short to complete (%d seconds)", totalTime)
 	}
-	tooLong := totalTime > int(rateLimit.Milliseconds())*(eachProxyReqCount-1)*len(clients)
+	tooLong := totalTime > int(rateLimit.Milliseconds())*(eachProxyReqCount-1)*len(pool.clients)
 	if tooLong {
 		t.Fatalf("requests took too long to complete (%d seconds)", totalTime)
 	}

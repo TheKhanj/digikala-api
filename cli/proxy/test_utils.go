@@ -1,31 +1,56 @@
 package proxy
 
 import (
-	"os"
-	"path"
-	"strings"
+	"net/http"
+	"testing"
+	"time"
 
-	"github.com/thekhanj/digikala-api/cli/internal"
+	"github.com/thekhanj/digikala-api/cli/config"
 )
 
 func getTestProxies() ([]string, error) {
-	bytes, err := os.ReadFile(
-		path.Join(
-			internal.GetProjectRoot(),
-			"test-proxies",
-		),
-	)
+	config, err := config.ReadTestConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	proxies := strings.Split(string(bytes), "\n")
-	ret := make([]string, 0)
-	for _, p := range proxies {
-		if p != "" {
-			ret = append(ret, p)
-		}
+	proxies, err := config.Api.Client.GetProxies()
+	if err != nil {
+		return nil, err
 	}
 
-	return ret, nil
+	return proxies, nil
+}
+
+func getClients() ([]*http.Client, error) {
+	proxies, err := getTestProxies()
+	if err != nil {
+		return nil, err
+	}
+	clients := make([]*http.Client, len(proxies))
+	for i, proxy := range proxies {
+		client, err := NewProxyClient(proxy)
+		if err != nil {
+			return nil, err
+		}
+		clients[i] = client
+	}
+
+	return clients, nil
+}
+
+func NewTestingClientPool(
+	t *testing.T, rateLimit time.Duration,
+) *ClientPool {
+	clients, err := getClients()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pool, err := NewClientPool(rateLimit, clients...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return pool
 }
