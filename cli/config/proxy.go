@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"os/exec"
-	"path"
 	"strings"
 
 	"github.com/thekhanj/digikala-api/cli/internal"
@@ -20,20 +18,10 @@ func (this ProxyCmd) logStderr(bytes []byte) {
 	}
 }
 
-func (this ProxyCmd) getAbsPath(name string) string {
-	env := os.Getenv("env")
-
-	if !(env == "test" || env == "dev") {
-		return name
-	}
-
-	return path.Join(internal.GetProjectRoot(), name)
-}
-
 func (this ProxyCmd) Execute() ([]string, error) {
 	arr := strings.Split(string(this)[1:], " ")
 	name := arr[0]
-	abs_name := this.getAbsPath(name)
+	absName := internal.GetAbsPath(name)
 	args := make([]string, 0)
 	for _, arg := range arr[1:] {
 		if strings.TrimSpace(arg) != "" {
@@ -41,7 +29,7 @@ func (this ProxyCmd) Execute() ([]string, error) {
 		}
 	}
 
-	cmd := exec.CommandContext(context.Background(), abs_name, args...)
+	cmd := exec.CommandContext(context.Background(), absName, args...)
 	bytes, err := cmd.Output()
 	if err != nil {
 		this.logStderr(bytes)
