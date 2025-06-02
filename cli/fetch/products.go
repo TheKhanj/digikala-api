@@ -2,11 +2,15 @@ package fetch
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path"
+	"regexp"
+	"strconv"
 
 	"github.com/thekhanj/digikala-api/cli/internal"
 	"github.com/thekhanj/digikala-api/cli/proxy"
@@ -43,18 +47,17 @@ func (this *Products) fetchProduct(url string) ([]byte, error) {
 	return bytes, nil
 }
 
-func (this *Products) saveBody(index int, body []byte) error {
+func (this *Products) saveBody(index int, url string, body []byte) error {
 	j := make(map[string]interface{})
 	err := json.Unmarshal(body, &j)
 	if err != nil {
 		return err
 	}
 
-	// TODO: maybe use jq here...
-	// FUCK IT USE ID FROM URL
-	id := int(
-		j["data"].(map[string]interface{})["product"].(map[string]interface{})["id"].(float64),
-	)
+	id, err := this.getIdFromUrl(url)
+	if err != nil {
+		return err
+	}
 
 	fileName := fmt.Sprintf("%05d-%d.json", index, id)
 
@@ -64,6 +67,30 @@ func (this *Products) saveBody(index int, body []byte) error {
 	)
 }
 
+func (this *Products) getIdFromUrl(url string) (int, error) {
+	log.Println(url)
+	r := regexp.MustCompile("/v2/product/(?P<id>[0-9]*)")
+	matches := r.FindStringSubmatch(url)
+
+	subs := r.SubexpNames()
+	idFound := false
+	var idStr string
+
+	for i, sub := range subs {
+		if sub == "id" {
+			idFound = true
+			idStr = matches[i]
+			break
+		}
+	}
+
+	if !idFound {
+		return 0, errors.New("missing product id in url")
+	}
+
+	return strconv.Atoi(idStr)
+}
+
 func (this *Products) Fetch() error {
 	for index, url := range this.urls {
 		body, err := this.fetchProduct(url)
@@ -71,7 +98,7 @@ func (this *Products) Fetch() error {
 			return err
 		}
 
-		err = this.saveBody(index+1, body)
+		err = this.saveBody(index+1, url, body)
 		if err != nil {
 			return err
 		}
