@@ -1,11 +1,13 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
+	"syscall"
 )
 
 func GetProjectRoot() string {
@@ -53,4 +55,32 @@ func AssertAtLeastOneFile(dir string) error {
 	return fmt.Errorf(
 		"no files found in directory: %s", dir,
 	)
+}
+
+func GetProcDir() string {
+	if uid := syscall.Getuid(); uid == 0 {
+		return fmt.Sprintf("/var/run/digkala-api/%d", os.Getpid())
+	} else {
+		return fmt.Sprintf("/run/user/%d/digikala-api/%d", uid, os.Getpid())
+	}
+}
+
+func AssertDir(path string) error {
+	info, err := os.Stat(path)
+	if err == nil {
+		if !info.IsDir() {
+			return errors.New("path is not a directory: " + path)
+		}
+
+		return nil
+	}
+
+	if os.IsNotExist(err) {
+		if err := os.MkdirAll(path, 0755); err != nil {
+			return errors.New("failed to create directory: " + path)
+		}
+		return nil
+	}
+
+	return err
 }
