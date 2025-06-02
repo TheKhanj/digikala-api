@@ -37,6 +37,10 @@ func GetAbsPath(name string) string {
 		return name
 	}
 
+	if path.IsAbs(name) {
+		return name
+	}
+
 	return path.Join(GetProjectRoot(), name)
 }
 
