@@ -213,7 +213,7 @@ func NewJqBuilder() *JqBuilder {
 
 func NewJq(
 	data []byte, filter string, flags ...string,
-) (*Jq, error) {
+) *Jq {
 	b := NewJqBuilder().
 		WithFileData(data).
 		WithFilterString(filter)
@@ -222,5 +222,10 @@ func NewJq(
 		b.WithFlag(f)
 	}
 
-	return b.Build()
+	jq, err := b.Build()
+	if err != nil {
+		panic(`regexp: ` + err.Error())
+	}
+
+	return jq
 }

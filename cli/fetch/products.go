@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"github.com/thekhanj/digikala-api/cli/internal"
+	"github.com/thekhanj/digikala-api/cli/jq"
 	"github.com/thekhanj/digikala-api/cli/proxy"
 )
 
@@ -46,7 +47,7 @@ func (this *Products) fetchProduct(url string) ([]byte, error) {
 		return nil, err
 	}
 
-	return bytes, nil
+	return jq.NewJq(bytes, ".").Start()
 }
 
 func (this *Products) saveBody(index int, url string, body []byte) error {
