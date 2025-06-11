@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"net/http"
 	"testing"
 	"time"
 
@@ -22,27 +21,14 @@ func getTestProxies() ([]string, error) {
 	return proxies, nil
 }
 
-func getClients() ([]*http.Client, error) {
-	proxies, err := getTestProxies()
-	if err != nil {
-		return nil, err
-	}
-	clients := make([]*http.Client, len(proxies))
-	for i, proxy := range proxies {
-		client, err := NewProxyClient(proxy)
-		if err != nil {
-			return nil, err
-		}
-		clients[i] = client
-	}
-
-	return clients, nil
-}
-
 func NewTestingClientPool(
 	t *testing.T, rateLimit time.Duration,
 ) *ClientPool {
-	clients, err := getClients()
+	proxies, err := getTestProxies()
+	if err != nil {
+		t.Fatal(err)
+	}
+	clients, err := NewProxyClientList(proxies)
 	if err != nil {
 		t.Fatal(err)
 	}

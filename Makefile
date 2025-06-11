@@ -6,8 +6,10 @@ GO_SRC_FILES = $(shell find cli -name '*.go') \
 
 all: cli
 
-cli: $(GO_SRC_FILES)
-	go build
+cli: bin/cli
+
+bin/cli: $(GO_SRC_FILES)
+	go build -o ./bin/cli ./cli
 
 go-config: $(GO_CONFIG)
 

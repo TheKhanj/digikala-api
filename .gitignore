@@ -1,2 +1,4 @@
 /.env
 /test/.cache
+/.cache
+/bin

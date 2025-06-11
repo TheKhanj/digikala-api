@@ -64,3 +64,16 @@ func NewProxyClient(proxyStr string) (*http.Client, error) {
 
 	return &http.Client{Transport: t}, nil
 }
+
+func NewProxyClientList(proxies []string) ([]*http.Client, error) {
+	clients := make([]*http.Client, len(proxies))
+	for i, proxy := range proxies {
+		client, err := NewProxyClient(proxy)
+		if err != nil {
+			return nil, err
+		}
+		clients[i] = client
+	}
+
+	return clients, nil
+}

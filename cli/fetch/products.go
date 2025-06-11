@@ -23,6 +23,8 @@ type Products struct {
 }
 
 func (this *Products) fetchProduct(url string) ([]byte, error) {
+	log.Printf("products: fetching %s", url)
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -68,7 +70,6 @@ func (this *Products) saveBody(index int, url string, body []byte) error {
 }
 
 func (this *Products) getIdFromUrl(url string) (int, error) {
-	log.Println(url)
 	r := regexp.MustCompile("/v2/product/(?P<id>[0-9]*)")
 	matches := r.FindStringSubmatch(url)
 
